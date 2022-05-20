@@ -148,6 +148,11 @@ impl<F: PrimeField, H: FieldHasher<F>, const N: usize> Path<F, H, N> {
     /// Assumes leaf contains leaf-level data, i.e. hashes of secrets
     /// stored on leaf-level.
     pub fn calculate_root(&self, leaf: &F, hasher: &H) -> Result<F, Error> {
+        // XXX: If empty path, return leaf.
+        if self.path.len() == 0 {
+            return Ok(*leaf);
+        }
+        
 	if *leaf != self.path[0].0 && *leaf != self.path[0].1 {
 	    return Err(MerkleError::InvalidLeaf.into());
 	}
@@ -171,7 +176,10 @@ impl<F: PrimeField, H: FieldHasher<F>, const N: usize> Path<F, H, N> {
 	if !self.check_membership(root_hash, leaf, hasher)? {
 	    return Err(MerkleError::InvalidLeaf.into());
 	}
-
+        // XXX: If path empty, return 0.
+        if self.path.len() == 0 {
+            return Ok(F::zero());
+        }
 	let mut prev = *leaf;
 	let mut index = F::zero();
 	let mut twopower = F::one();
@@ -288,6 +296,12 @@ impl<F: PrimeField, H: FieldHasher<F>, const N: usize> SparseMerkleTree<F, H, N>
     /// argument.
     pub fn generate_membership_proof(&self, index: u64) -> Path<F, H, N> {
 	let mut path = [(F::zero(), F::zero()); N];
+        if path.len() == 0 {
+            return Path {
+	        path,
+	        marker: PhantomData,
+	    };
+        }
 
 	let tree_index = convert_index_to_last_level(index, N);
 
