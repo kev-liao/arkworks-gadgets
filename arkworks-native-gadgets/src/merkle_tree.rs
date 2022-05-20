@@ -340,13 +340,13 @@ pub fn gen_empty_hashes<F: PrimeField, H: FieldHasher<F>, const N: usize>(
 ) -> Result<[F; N], Error> {
     let mut empty_hashes = [F::zero(); N];
 
-    let mut empty_hash = F::from_le_bytes_mod_order(default_leaf);
-    empty_hashes[0] = empty_hash;
-
-    for i in 1..N {
-	empty_hash = hasher.hash_two(&empty_hash, &empty_hash)?;
-	empty_hashes[i] = empty_hash;
-    }
+    //let mut empty_hash = F::from_le_bytes_mod_order(default_leaf);
+    //empty_hashes[0] = empty_hash;
+    //
+    //for i in 1..N {
+    //    empty_hash = hasher.hash_two(&empty_hash, &empty_hash)?;
+    //    empty_hashes[i] = empty_hash;
+    //}
 
     Ok(empty_hashes)
 }
