@@ -149,9 +149,9 @@ impl<F: PrimeField, H: FieldHasher<F>, const N: usize> Path<F, H, N> {
     /// stored on leaf-level.
     pub fn calculate_root(&self, leaf: &F, hasher: &H) -> Result<F, Error> {
         // XXX: If empty path, return leaf.
-        if self.path.len() == 0 {
-            return Ok(*leaf);
-        }
+        //if self.path.len() == 0 {
+        //    return Ok(*leaf);
+        //}
         
 	if *leaf != self.path[0].0 && *leaf != self.path[0].1 {
 	    return Err(MerkleError::InvalidLeaf.into());
@@ -177,9 +177,9 @@ impl<F: PrimeField, H: FieldHasher<F>, const N: usize> Path<F, H, N> {
 	    return Err(MerkleError::InvalidLeaf.into());
 	}
         // XXX: If path empty, return 0.
-        if self.path.len() == 0 {
-            return Ok(F::zero());
-        }
+        //if self.path.len() == 0 {
+        //    return Ok(F::zero());
+        //}
 	let mut prev = *leaf;
 	let mut index = F::zero();
 	let mut twopower = F::one();
@@ -215,6 +215,12 @@ impl<F: PrimeField, H: FieldHasher<F>, const N: usize> SparseMerkleTree<F, H, N>
     /// Takes a batch of field elements, inserts
     /// these hashes into the tree, and updates the merkle root.
     pub fn insert_batch(&mut self, leaves: &BTreeMap<u32, F>, hasher: &H) -> Result<(), Error> {
+        if leaves.len() == 1 {
+            self.tree.insert(0, leaves[&0]);
+            return Ok(());
+            
+        }
+        
 	let last_level_index: u64 = (1u64 << N) - 1;        
 
 	let mut level_idxs: BTreeSet<u64> = BTreeSet::new();
@@ -484,6 +490,25 @@ mod test {
 
 	assert_eq!(root, hash1234);
     }
+
+    #[test]
+    fn should_create_root_tree_poseidon() {
+	let rng = &mut test_rng();
+	let curve = Curve::Bls381;
+
+	let params = setup_params(curve, 5, 3);
+	let poseidon = Poseidon::new(params);
+	let default_leaf = [0u8; 32];
+	let leaves = [Fq::rand(rng)];
+	const HEIGHT: usize = 0;
+	let smt =
+	    create_merkle_tree::<Fq, BLSHash, HEIGHT>(poseidon.clone(), &leaves, &default_leaf);
+
+	let root = smt.root();
+	let proof = smt.generate_membership_proof(0);
+
+	assert_eq!(root, leaves[0]);
+    }    
 
     #[test]
     fn should_generate_and_validate_proof_poseidon() {
