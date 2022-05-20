@@ -273,7 +273,7 @@ mod test {
 
 	type SMTCRHGadget = PoseidonGadget<Fq>;
 
-	const HEIGHT: usize = 30;
+	const HEIGHT: usize = 2;
 	const DEFAULT_LEAF: [u8; 32] = [0; 32];
 	type SMT = SparseMerkleTree<Fq, Poseidon<Fq>, HEIGHT>;
 
@@ -288,7 +288,7 @@ mod test {
 		let mut cs = ConstraintSystem::<Fq>::new_ref();
 		let hasher_gadget = PoseidonGadget::from_native(&mut cs, hasher.clone()).unwrap();
 
-		let leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
+		let leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
 		let smt = SMT::new_sequential(&leaves, &hasher, &DEFAULT_LEAF).unwrap();
 		let root = smt.root();
 		let path = smt.generate_membership_proof(0);
@@ -317,7 +317,7 @@ mod test {
 		let mut cs = ConstraintSystem::<Fq>::new_ref();
 		let hasher_gadget = PoseidonGadget::from_native(&mut cs, hasher.clone()).unwrap();
 
-		let leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
+		let leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
 		let smt = SMT::new_sequential(&leaves, &hasher, &DEFAULT_LEAF).unwrap();
 		let root = smt.root();
 		let path = smt.generate_membership_proof(index);
@@ -352,12 +352,12 @@ mod test {
 		let mut cs = ConstraintSystem::<Fq>::new_ref();
 		let hasher_gadget = PoseidonGadget::from_native(&mut cs, hasher.clone()).unwrap();
 
-		let leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
+		let leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
 		let smt = SMT::new_sequential(&leaves, &hasher, &DEFAULT_LEAF).unwrap();
 		let path = smt.generate_membership_proof(index);
 
 		// Now generate a bad root to make this fail:
-		let bad_leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
+		let bad_leaves = vec![Fq::rand(rng), Fq::rand(rng), Fq::rand(rng), Fq::rand(rng)];
 		let bad_smt = SMT::new_sequential(&bad_leaves, &hasher, &DEFAULT_LEAF).unwrap();
 		let bad_root = bad_smt.root();
 
